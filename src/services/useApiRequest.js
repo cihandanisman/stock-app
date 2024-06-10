@@ -1,4 +1,4 @@
-import axios from "axios";
+
 import { toastErrorNotify, toastSuccessNotify } from "../helper/ToastNotify";
 import {
   fetchStart,
@@ -6,25 +6,24 @@ import {
   loginSuccess,
   registerSuccess,
   logoutSuccess,
+  
 } from "../features/authSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import useAxios from "./useAxios"
 // import useAxios from "./useAxios";
 
 const useApiRequest = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  // const { axiosToken, axiosPublic } = useAxios();
-  const { token } = useSelector((state) => state.auth);
+  const { axiosToken, axiosPublic } = useAxios();
+  // const { token } = useSelector((state) => state.auth);
   const login = async (userData) => {
     //   const BASE_URL = "https://10103.fullstack.clarusway.com";
     dispatch(fetchStart());
 
     try {
-      const { data } = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/auth/login`,
-        userData
-      );
+      const { data } = await axiosPublic.post("/auth/login/", userData)
       dispatch(loginSuccess(data));
       toastSuccessNotify("Successfully logged in");
       navigate("/stock");
@@ -38,10 +37,7 @@ const useApiRequest = () => {
     dispatch(fetchStart());
 
     try {
-      const { data } = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/users`,
-        userInfo
-      );
+      const { data } = await axiosPublic.post("/users/", userInfo)
       dispatch(registerSuccess(data));
       toastSuccessNotify("Successfully logged in");
       navigate("/stock");
@@ -54,10 +50,10 @@ const useApiRequest = () => {
     dispatch(fetchStart());
 
     try {
-      // await axiosToken.get("/auth/logout");
-      await axios(`${process.env.REACT_APP_BASE_URL}/auth/logout`, {
-        headers: { Authorization: `Token ${token}` },
-      } );
+      await axiosToken.get("/auth/logout");
+      // await axios(`${process.env.REACT_APP_BASE_URL}/auth/logout`, {
+      //   headers: { Authorization: `Token ${token}` },
+      // } );
       dispatch(logoutSuccess());
 
       // navigate("/")
